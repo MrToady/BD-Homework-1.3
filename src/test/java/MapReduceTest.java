@@ -28,7 +28,7 @@ public class MapReduceTest {
     public static final Text OUTPUT_4 = new Text("Unknown ID:321321");  //id 321321
     public static final IntWritable ONE = new IntWritable(1);
     public static final IntWritable TWO = new IntWritable(2);
-    private MapReduceDriver<LongWritable, Text, IntWritable, IntWritable, Text, IntWritable> mapReduceDriver;
+    private MapReduceDriver<LongWritable, Text, IntWritable, HighBitOSWritable, Text, IntWritable> mapReduceDriver;
 
     @Before
     public void setUp() {

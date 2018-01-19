@@ -9,31 +9,32 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HighBitPriceReducer extends Reducer<IntWritable, IntWritable, Text, IntWritable> {
+public class HighBitPriceReducer extends Reducer<IntWritable, HighBitOSWritable, Text, IntWritable> {
     private IntWritable sum = new IntWritable();
-    private Map<Integer, Text> map = new HashMap<>();
+    private Map<Integer, Text> cityMap = new HashMap<>();
 
     @Override
     protected void setup(Context context) throws IOException, InterruptedException {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("city.en.txt")));
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("city.en.txt")));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("/home/taras/Desktop/hadoop_distr/Homework1-3 dataset/city.en.txt")));
         String line;
         while ((line = reader.readLine()) != null) {
             String[] idAndCityName = line.split("[\t ]");
             int id = Integer.valueOf(idAndCityName[0]);
             String cityName = idAndCityName[1];
-            map.put(id, new Text(cityName));
+            cityMap.put(id, new Text(cityName));
         }
     }
 
     @Override
-    protected void reduce(IntWritable key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
+    protected void reduce(IntWritable key, Iterable<HighBitOSWritable> values, Context context) throws IOException, InterruptedException {
         int highBitPriceImpressionsCounter = 0;
 
-        for (IntWritable value : values) {
-            highBitPriceImpressionsCounter += value.get();
+        for (HighBitOSWritable value : values) {
+            highBitPriceImpressionsCounter += value.getHighBitPriceImpressions();
         }
 
-        Text cityTextValue = map.getOrDefault(key.get(), new Text(String.format("Unknown ID:%d", key.get())));
+        Text cityTextValue = cityMap.getOrDefault(key.get(), new Text(String.format("Unknown ID:%d", key.get())));
         sum.set(highBitPriceImpressionsCounter);
         context.write(cityTextValue, sum);
     }

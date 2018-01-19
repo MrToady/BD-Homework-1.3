@@ -19,12 +19,12 @@ public class HighBitPriceMapperTest {
     public static final Text INPUT_1 = new Text(LOG_STRING_1 + "\n" + LOG_STRING_2);
     public static final Text INPUT_2 = new Text(LOG_STRING_3 + "\n" + LOG_STRING_4 + "\n" + LOG_STRING_5);
     public static final Text INPUT_3 = new Text(LOG_LOW_PRICE);
-    public static final IntWritable ONE = new IntWritable(1);
+    public static final HighBitOSWritable ONE = new HighBitOSWritable(1, "Windows XP");
     public static final IntWritable OUTPUT_KEY_1 = new IntWritable(234);
     public static final IntWritable OUTPUT_KEY_2 = new IntWritable(222);
     public static final IntWritable OUTPUT_KEY_3 = new IntWritable(226);
 
-    private MapDriver<LongWritable, Text, IntWritable, IntWritable> mapDriver;
+    private MapDriver<LongWritable, Text, IntWritable, HighBitOSWritable> mapDriver;
 
     @Before
     public void setUp() {

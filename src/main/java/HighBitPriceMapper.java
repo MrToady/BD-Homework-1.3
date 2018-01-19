@@ -1,4 +1,6 @@
 import lombok.extern.slf4j.Slf4j;
+import net.sf.uadetector.UserAgentStringParser;
+import net.sf.uadetector.service.UADetectorServiceFactory;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -8,10 +10,11 @@ import java.io.IOException;
 import java.util.StringTokenizer;
 
 @Slf4j
-public class HighBitPriceMapper extends Mapper<LongWritable, Text, IntWritable, IntWritable> {
+public class HighBitPriceMapper extends Mapper<LongWritable, Text, IntWritable, HighBitOSWritable> {
     private static final String ENTRY_DELIMITER = "\n";
     private static final String COLUMN_DELIMITER = "\t";
-    private static final IntWritable ONE = new IntWritable(1);
+    private final UserAgentStringParser userAgentStringParser = UADetectorServiceFactory.getResourceModuleParser();
+    private HighBitOSWritable writable = new HighBitOSWritable();
     private IntWritable cityId = new IntWritable();
 
     @Override
@@ -23,11 +26,19 @@ public class HighBitPriceMapper extends Mapper<LongWritable, Text, IntWritable, 
 
             int cityIdInt = Integer.valueOf(dataArray[7]);
             int bidPrice = Integer.valueOf(dataArray[19]);
+            String userAgent = dataArray[4];
+//            System.out.println(getOperationSystemName(userAgent));
 
             if (bidPrice > 250) {
                 cityId.set(cityIdInt);
-                context.write(cityId, ONE);
+                writable.setHighBitPriceImpressions(1);
+                writable.setOperationSystem(getOperationSystemName(userAgent));
+                context.write(cityId, writable);
             }
         }
+    }
+
+    private String getOperationSystemName(String userAgent) {
+        return userAgentStringParser.parse(userAgent).getOperatingSystem().getName();
     }
 }
