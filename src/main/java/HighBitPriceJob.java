@@ -29,7 +29,7 @@ public class HighBitPriceJob {
 
 //        job.setNumReduceTasks(Runtime.getRuntime().availableProcessors() + 1);
         job.setNumReduceTasks(1);
-        job.addCacheFile(URI.create("/tmp/taras/city.en.txt"));
+        job.addCacheFile(URI.create("/taras/city.en.txt"));
 
         FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));

@@ -19,6 +19,7 @@ public class HighBitPriceMapper extends Mapper<LongWritable, Text, IntWritable, 
 
     @Override
     protected void setup(Context context) throws IOException, InterruptedException {
+        log.debug("mapper setup");
         writable = new HighBitOSWritable();
         writable.setHighBitPriceImpressions(1);
     }
@@ -37,6 +38,7 @@ public class HighBitPriceMapper extends Mapper<LongWritable, Text, IntWritable, 
 
         String[] dataArray;
         while (tokenizer.hasMoreTokens()) {
+            log.debug("splitting log string");
             dataArray = tokenizer.nextToken().split(COLUMN_DELIMITER);
             int bidPrice = Integer.valueOf(dataArray[19]);
 
@@ -47,6 +49,7 @@ public class HighBitPriceMapper extends Mapper<LongWritable, Text, IntWritable, 
                 cityId.set(cityIdInt);
 //                writable.setHighBitPriceImpressions(1);
                 writable.setOperationSystem(getOperationSystemName(userAgent));
+                log.debug("Mapper: write in context: {} - {}", cityIdInt, writable.toString());
                 context.write(cityId, writable);
             }
         }
