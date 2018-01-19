@@ -8,6 +8,13 @@ import java.util.Map;
 public class HighBitPriceCombiner extends Reducer<IntWritable, HighBitOSWritable, IntWritable, HighBitOSWritable> {
     private HighBitOSWritable writable = new HighBitOSWritable();
 
+    /**
+     * Creates a map of OSN (here and next "Operation System Name") values and number of impressions
+     * Summarize numbers if the OSN is the same
+     * Writes constructed writable into context
+     *
+     * @see {@link HighBitOSWritable}
+     */
     @Override
     protected void reduce(IntWritable key, Iterable<HighBitOSWritable> values, Context context) {
         Map<String, Integer> valuesMap = new HashMap<>();

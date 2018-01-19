@@ -13,10 +13,16 @@ public class HighBitPriceReducer extends Reducer<IntWritable, HighBitOSWritable,
     private IntWritable sum = new IntWritable();
     private Map<Integer, Text> cityMap = new HashMap<>();
 
+    /**
+     * Summarize number of high bit price impressions from values
+     * Replace city ID to string representation of a city from cityMap and writes into context
+     * Writes constructed writable into context
+     *
+     * @see {@link HighBitOSWritable}
+     */
     @Override
     protected void setup(Context context) throws IOException, InterruptedException {
-//        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("city.en.txt")));
-        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("/home/taras/Desktop/hadoop_distr/Homework1-3 dataset/city.en.txt")));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("city.en.txt")));
         String line;
         while ((line = reader.readLine()) != null) {
             String[] idAndCityName = line.split("[\t ]");

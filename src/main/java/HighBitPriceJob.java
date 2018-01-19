@@ -23,12 +23,13 @@ public class HighBitPriceJob {
         job.setPartitionerClass(HighBitPricePartitioner.class);
 
         job.setMapOutputKeyClass(IntWritable.class);
-        job.setMapOutputValueClass(IntWritable.class);
+        job.setMapOutputValueClass(HighBitOSWritable.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
 
-        job.setNumReduceTasks(Runtime.getRuntime().availableProcessors() - 1);
-//        job.addCacheFile(URI.create("/tmp/taras/city.en.txt"));
+//        job.setNumReduceTasks(Runtime.getRuntime().availableProcessors());
+        job.setNumReduceTasks(1);
+        job.addCacheFile(URI.create("/tmp/taras/city.en.txt"));
 
         FileInputFormat.addInputPath(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));

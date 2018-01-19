@@ -17,6 +17,14 @@ public class HighBitPriceMapper extends Mapper<LongWritable, Text, IntWritable, 
     private HighBitOSWritable writable = new HighBitOSWritable();
     private IntWritable cityId = new IntWritable();
 
+    /**
+     * Splits input text in strings
+     * Splits the string in String array
+     * Parses information about city ID, price and User Agent from corresponding elements of array
+     * Constructs writable and writes it into context
+     *
+     * @see {@link HighBitOSWritable}
+     */
     @Override
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
         StringTokenizer tokenizer = new StringTokenizer(value.toString(), ENTRY_DELIMITER);
@@ -27,7 +35,6 @@ public class HighBitPriceMapper extends Mapper<LongWritable, Text, IntWritable, 
             int cityIdInt = Integer.valueOf(dataArray[7]);
             int bidPrice = Integer.valueOf(dataArray[19]);
             String userAgent = dataArray[4];
-//            System.out.println(getOperationSystemName(userAgent));
 
             if (bidPrice > 250) {
                 cityId.set(cityIdInt);

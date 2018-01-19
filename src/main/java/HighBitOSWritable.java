@@ -7,6 +7,9 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+/**
+ * Implements custom writable to store number of impressions and string value of an operation system
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
