@@ -1,6 +1,5 @@
+import eu.bitwalker.useragentutils.UserAgent;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.uadetector.UserAgentStringParser;
-import net.sf.uadetector.service.UADetectorServiceFactory;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -13,7 +12,7 @@ import java.util.StringTokenizer;
 public class HighBitPriceMapper extends Mapper<LongWritable, Text, IntWritable, HighBitOSWritable> {
     private static final String ENTRY_DELIMITER = "\n";
     private static final String COLUMN_DELIMITER = "\t";
-    private final UserAgentStringParser userAgentStringParser = UADetectorServiceFactory.getResourceModuleParser();
+    private UserAgent userAgent;
     private HighBitOSWritable writable;
     private IntWritable cityId = new IntWritable();
 
@@ -44,18 +43,18 @@ public class HighBitPriceMapper extends Mapper<LongWritable, Text, IntWritable, 
 
             if (bidPrice > 250) {
                 int cityIdInt = Integer.valueOf(dataArray[7]);
-                String userAgent = dataArray[4];
+                String userAgentString = dataArray[4];
 
                 cityId.set(cityIdInt);
-//                writable.setHighBitPriceImpressions(1);
-                writable.setOperationSystem(getOperationSystemName(userAgent));
+                writable.setOperationSystem(getOperationSystemName(userAgentString));
                 log.debug("Mapper: write in context: {} - {}", cityIdInt, writable.toString());
                 context.write(cityId, writable);
             }
         }
     }
 
-    private String getOperationSystemName(String userAgent) {
-        return userAgentStringParser.parse(userAgent).getOperatingSystem().getName();
+    private String getOperationSystemName(String userAgentString) {
+        userAgent = new UserAgent(userAgentString);
+        return userAgent.getOperatingSystem().getName();
     }
 }
