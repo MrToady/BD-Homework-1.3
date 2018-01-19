@@ -14,8 +14,14 @@ public class HighBitPriceMapper extends Mapper<LongWritable, Text, IntWritable, 
     private static final String ENTRY_DELIMITER = "\n";
     private static final String COLUMN_DELIMITER = "\t";
     private final UserAgentStringParser userAgentStringParser = UADetectorServiceFactory.getResourceModuleParser();
-    private HighBitOSWritable writable = new HighBitOSWritable();
+    private HighBitOSWritable writable;
     private IntWritable cityId = new IntWritable();
+
+    @Override
+    protected void setup(Context context) throws IOException, InterruptedException {
+        writable = new HighBitOSWritable();
+        writable.setHighBitPriceImpressions(1);
+    }
 
     /**
      * Splits input text in strings
@@ -29,16 +35,17 @@ public class HighBitPriceMapper extends Mapper<LongWritable, Text, IntWritable, 
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
         StringTokenizer tokenizer = new StringTokenizer(value.toString(), ENTRY_DELIMITER);
 
+        String[] dataArray;
         while (tokenizer.hasMoreTokens()) {
-            String[] dataArray = tokenizer.nextToken().split(COLUMN_DELIMITER);
-
-            int cityIdInt = Integer.valueOf(dataArray[7]);
+            dataArray = tokenizer.nextToken().split(COLUMN_DELIMITER);
             int bidPrice = Integer.valueOf(dataArray[19]);
-            String userAgent = dataArray[4];
 
             if (bidPrice > 250) {
+                int cityIdInt = Integer.valueOf(dataArray[7]);
+                String userAgent = dataArray[4];
+
                 cityId.set(cityIdInt);
-                writable.setHighBitPriceImpressions(1);
+//                writable.setHighBitPriceImpressions(1);
                 writable.setOperationSystem(getOperationSystemName(userAgent));
                 context.write(cityId, writable);
             }

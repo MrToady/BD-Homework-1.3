@@ -23,6 +23,7 @@ public class HighBitPriceReducer extends Reducer<IntWritable, HighBitOSWritable,
     @Override
     protected void setup(Context context) throws IOException, InterruptedException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("city.en.txt")));
+//        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("/home/taras/Desktop/hadoop_distr/Homework1-3 dataset/city.en.txt")));
         String line;
         while ((line = reader.readLine()) != null) {
             String[] idAndCityName = line.split("[\t ]");
