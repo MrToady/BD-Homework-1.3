@@ -6,26 +6,16 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
 import java.io.IOException;
-import java.util.StringTokenizer;
 
 @Slf4j
-public class HighBitPriceMapper extends Mapper<LongWritable, Text, IntWritable, HighBitOSWritable> {
-    private static final String ENTRY_DELIMITER = "\n";
+public class HighBitPriceMapper extends Mapper<LongWritable, Text, HighBitOSWritable, IntWritable> {
     private static final String COLUMN_DELIMITER = "\t";
     private UserAgent userAgent;
-    private HighBitOSWritable writable;
-    private IntWritable cityId = new IntWritable();
-
-    @Override
-    protected void setup(Context context) throws IOException, InterruptedException {
-        log.debug("mapper setup");
-        writable = new HighBitOSWritable();
-        writable.setHighBitPriceImpressions(1);
-    }
+    private HighBitOSWritable outputKey = new HighBitOSWritable();
+    private IntWritable one = new IntWritable(1);
 
     /**
-     * Splits input text in strings
-     * Splits the string in String array
+     * Splits input string in String array
      * Parses information about city ID, price and User Agent from corresponding elements of array
      * Constructs writable and writes it into context
      *
@@ -33,23 +23,20 @@ public class HighBitPriceMapper extends Mapper<LongWritable, Text, IntWritable, 
      */
     @Override
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
-        StringTokenizer tokenizer = new StringTokenizer(value.toString(), ENTRY_DELIMITER);
 
-        String[] dataArray;
-        while (tokenizer.hasMoreTokens()) {
-            log.debug("splitting log string");
-            dataArray = tokenizer.nextToken().split(COLUMN_DELIMITER);
-            int bidPrice = Integer.valueOf(dataArray[19]);
+        log.debug("splitting log string");
+        String[] dataArray = value.toString().split(COLUMN_DELIMITER);
+        int bidPrice = Integer.valueOf(dataArray[19]);
 
-            if (bidPrice > 250) {
-                int cityIdInt = Integer.valueOf(dataArray[7]);
-                String userAgentString = dataArray[4];
+        if (bidPrice > 250) {
+            int cityIdInt = Integer.valueOf(dataArray[7]);
+            String userAgentString = dataArray[4];
 
-                cityId.set(cityIdInt);
-                writable.setOperationSystem(getOperationSystemName(userAgentString));
-                log.debug("Mapper: write in context: {} - {}", cityIdInt, writable.toString());
-                context.write(cityId, writable);
-            }
+            outputKey.setCityID(cityIdInt);
+            outputKey.setOperationSystem(getOperationSystemName(userAgentString));
+
+            log.debug("Mapper: write in context: {} - {}", outputKey, one);
+            context.write(outputKey, one);
         }
     }
 

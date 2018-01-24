@@ -3,39 +3,25 @@ import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 @Slf4j
-public class HighBitPriceCombiner extends Reducer<IntWritable, HighBitOSWritable, IntWritable, HighBitOSWritable> {
-    private HighBitOSWritable writable = new HighBitOSWritable();
+public class HighBitPriceCombiner extends Reducer<HighBitOSWritable, IntWritable, HighBitOSWritable, IntWritable> {
+    private IntWritable value = new IntWritable();
 
     /**
-     * Creates a map of OSN (here and next "Operation System Name") values and number of impressions
-     * Summarize numbers if the OSN is the same
+     * Summarize values of amounts by keys
      * Writes constructed writable into context
      *
      * @see {@link HighBitOSWritable}
      */
     @Override
-    protected void reduce(IntWritable key, Iterable<HighBitOSWritable> values, Context context) {
-        Map<String, Integer> valuesMap = new HashMap<>();
-
+    protected void reduce(HighBitOSWritable key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
+        int valueCounter = 0;
         log.debug("Combiner: Start iterate through values");
-        for (HighBitOSWritable value : values) {
-            log.debug("Combiner: merging values");
-            valuesMap.merge(value.getOperationSystem(), 1, Integer::sum);
+        for (IntWritable ignored : values) {
+            valueCounter++;
         }
-
-        valuesMap.forEach((operationSystem, amount) -> {
-            writable.setOperationSystem(operationSystem);
-            writable.setHighBitPriceImpressions(amount);
-            try {
-                log.debug("{} - {} was written in the context", operationSystem, amount);
-                context.write(key, writable);
-            } catch (IOException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        value.set(valueCounter);
+        context.write(key, value);
     }
 }

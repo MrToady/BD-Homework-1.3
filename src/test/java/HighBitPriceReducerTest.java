@@ -10,16 +10,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class HighBitPriceReducerTest {
-    private ReduceDriver<IntWritable, HighBitOSWritable, Text, IntWritable> reduceDriver;
-    private List<HighBitOSWritable> valuesList;
-    private static final IntWritable INPUT_KEY_1 = new IntWritable(41);
+    private ReduceDriver<HighBitOSWritable, IntWritable, Text, IntWritable> reduceDriver;
+    private List<IntWritable> valuesList;
+    private static final HighBitOSWritable INPUT_KEY_1 = new HighBitOSWritable(41,"Windows XP" );
     //This ID is absent in CityID map
-    private static final IntWritable INPUT_KEY_2 = new IntWritable(40);
-    private static final HighBitOSWritable INPUT_VALUE_1 = new HighBitOSWritable(1, "Windows XP");
-    private static final HighBitOSWritable INPUT_VALUE_2 = new HighBitOSWritable(2, "Windows XP");
-    private static final HighBitOSWritable INPUT_VALUE_3 = new HighBitOSWritable(3, "Windows XP");
-    private static final HighBitOSWritable INPUT_VALUE_4 = new HighBitOSWritable(4, "Windows XP");
-    private static final HighBitOSWritable INPUT_VALUE_5 = new HighBitOSWritable(5, "Windows XP");
+    private static final HighBitOSWritable INPUT_KEY_2 = new HighBitOSWritable(40,"Windows XP");
+
+
+
+    private static final IntWritable INPUT_VALUE_1 = new IntWritable(1);
+    private static final IntWritable INPUT_VALUE_2 = new IntWritable(2);
+    private static final IntWritable INPUT_VALUE_3 = new IntWritable(3);
+    private static final IntWritable INPUT_VALUE_4 = new IntWritable(4);
+    private static final IntWritable INPUT_VALUE_5 = new IntWritable(5);
 
     private static final Text OUTPUT_KEY_1 = new Text("shenyang");
     private static final Text OUTPUT_KEY_2 = new Text("Unknown ID:40");

@@ -19,16 +19,14 @@ public class HighBitPriceJob {
         job.setMapperClass(HighBitPriceMapper.class);
         job.setReducerClass(HighBitPriceReducer.class);
         job.setCombinerClass(HighBitPriceCombiner.class);
-        job.setSortComparatorClass(IntWritable.Comparator.class);
         job.setPartitionerClass(HighBitPricePartitioner.class);
 
-        job.setMapOutputKeyClass(IntWritable.class);
-        job.setMapOutputValueClass(HighBitOSWritable.class);
+        job.setMapOutputKeyClass(HighBitOSWritable.class);
+        job.setMapOutputValueClass(IntWritable.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
 
-//        job.setNumReduceTasks(Runtime.getRuntime().availableProcessors() + 1);
-        job.setNumReduceTasks(1);
+        job.setNumReduceTasks(Runtime.getRuntime().availableProcessors() + 1);
         job.addCacheFile(URI.create("/taras/city.en.txt"));
 
         FileInputFormat.addInputPath(job, new Path(args[0]));

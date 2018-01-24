@@ -11,9 +11,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Slf4j
-public class HighBitPriceReducer extends Reducer<IntWritable, HighBitOSWritable, Text, IntWritable> {
+public class HighBitPriceReducer extends Reducer<HighBitOSWritable, IntWritable, Text, IntWritable> {
     private IntWritable sum = new IntWritable();
     private Map<Integer, Text> cityMap = new HashMap<>();
+    private int cityIDint = -1;
+    private int globalImpressionsCounter = 0;
 
     /**
      * Summarize number of high bit price impressions from values
@@ -26,7 +28,6 @@ public class HighBitPriceReducer extends Reducer<IntWritable, HighBitOSWritable,
     protected void setup(Context context) throws IOException, InterruptedException {
         log.debug("start Setup");
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("city.en.txt")));
-//        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream("/home/taras/Desktop/hadoop_distr/Homework1-3 dataset/city.en.txt")));
         String line;
         while ((line = reader.readLine()) != null) {
             String[] idAndCityName = line.split("[\t ]");
@@ -35,24 +36,36 @@ public class HighBitPriceReducer extends Reducer<IntWritable, HighBitOSWritable,
             cityMap.put(id, new Text(cityName));
         }
         log.debug("city map created");
-
     }
 
     @Override
-    protected void reduce(IntWritable key, Iterable<HighBitOSWritable> values, Context context) throws IOException, InterruptedException {
-        log.debug("reduce method start");
-        int highBitPriceImpressionsCounter = 0;
+    protected void reduce(HighBitOSWritable key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
 
-        for (HighBitOSWritable value : values) {
-            log.debug("summarizing HighBitPriceImpressions current sum:{}", highBitPriceImpressionsCounter);
-            highBitPriceImpressionsCounter += value.getHighBitPriceImpressions();
+        int highBitPriceImpressionsCounter = 0;
+        for (IntWritable value : values) {
+            highBitPriceImpressionsCounter += value.get();
         }
 
-        Text cityTextValue = cityMap.getOrDefault(key.get(), new Text(String.format("Unknown ID:%d", key.get())));
-        sum.set(highBitPriceImpressionsCounter);
+        if (key.getCityID() == cityIDint) {
+            globalImpressionsCounter += highBitPriceImpressionsCounter;
+        } else {
+            writePreviousPairIntoContext(context);
+            globalImpressionsCounter = highBitPriceImpressionsCounter;
+            cityIDint = key.getCityID();
 
-        log.debug("write in context");
-        context.write(cityTextValue, sum);
-        log.debug("{} - {} written in context", cityTextValue.toString(), highBitPriceImpressionsCounter);
+        }
+    }
+
+    private void writePreviousPairIntoContext(Context context) throws IOException, InterruptedException {
+        if (cityIDint != -1) {
+            Text cityTextValue = cityMap.getOrDefault(cityIDint, new Text(String.format("Unknown ID:%d", cityIDint)));
+            sum.set(globalImpressionsCounter);
+            context.write(cityTextValue, sum);
+        }
+    }
+
+    @Override
+    protected void cleanup(Context context) throws IOException, InterruptedException {
+        writePreviousPairIntoContext(context);
     }
 }
